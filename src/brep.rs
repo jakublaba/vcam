@@ -21,34 +21,28 @@ impl Brep {
         Brep::new(v, self.edges.clone())
     }
 
-    pub fn scale(&self, s: f64) -> Brep {
-        let scale = Matrix4::from_scale(s);
-        let v = self.vertices.iter()
-            .map(|v| scale.transform_point(*v))
-            .collect();
-        Brep::new(v, self.edges.clone())
-    }
-
     pub fn transform(&mut self, transform_matrix: Matrix4<f64>) {
-        println!("Transformation");
         for v in &mut self.vertices {
             *v = transform_matrix.transform_point(*v);
         }
     }
 
-    pub fn cast_2d(&mut self, fov: f64, ar: f64, near: f64, far: f64) {
-        println!("Projection");
+    pub fn cast_2d(&self, fov: f64, ar: f64, near: f64, far: f64) -> Brep {
         let projection = cgmath::perspective(cgmath::Deg(fov), ar, near, far);
-        for v in &mut self.vertices {
-            *v = projection.transform_point(*v);
-        }
+        let v = self.vertices.iter()
+            .map(|v| projection.transform_point(*v))
+            .collect();
+        Brep::new(v, self.edges.clone())
     }
 
-    pub fn screen_coords(&mut self, vw: u32, vh: u32) {
-        println!("Coord transformation");
-        for v in &mut self.vertices {
-            v.x = (v.x + 1.) * 0.5 * vw as f64;
-            v.x = (v.y + 1.) * 0.5 * vh as f64;
-        }
+    pub fn screen_coords(&self, vw: u32, vh: u32) -> Brep {
+        let v = self.vertices.iter()
+            .map(|v| Point3::new(
+                (v.x + 1.) * 0.5 * vw as f64,
+                (v.y + 1.) * 0.5 * vh as f64,
+                0.,
+            ))
+            .collect();
+        Brep::new(v, self.edges.clone())
     }
 }
