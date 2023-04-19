@@ -21,10 +21,11 @@ impl Brep {
         Brep::new(v, self.edges.clone())
     }
 
-    pub fn transform(&mut self, transform_matrix: Matrix4<f64>) {
-        for v in &mut self.vertices {
-            *v = transform_matrix.transform_point(*v);
-        }
+    pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Brep {
+        let v = self.vertices.iter()
+            .map(|v| transform_matrix.transform_point(*v))
+            .collect();
+        Brep::new(v, self.edges.clone())
     }
 
     pub fn cast_2d(&self, fov: f64, ar: f64, near: f64, far: f64) -> Brep {
