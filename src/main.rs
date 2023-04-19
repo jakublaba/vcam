@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use nalgebra::Vector3;
+use cgmath::{Matrix4, Quaternion, Rotation3, Vector3};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -18,8 +18,8 @@ const VW: u32 = 800;
 const VH: u32 = 600;
 const MOVE_STEP: f64 = 10.;
 const ZOOM_STEP: f64 = 0.1;
-const ROT_STEP: f64 = 5. * PI / 180.;
-const FOV: f64 = 60. * PI / 180.;
+const ROT_STEP: f64 = 5.;
+const FOV: f64 = 45.;
 const AR: f64 = (VW / VH) as f64;
 const NEAR: f64 = 0.1;
 const FAR: f64 = 100.;
@@ -29,6 +29,7 @@ fn main() {
     for o in &objects {
         println!("{:?}", o)
     }
+    println!("Finished generating cubes\n");
 
     let sld_ctx = sdl2::init().unwrap();
     let video_subsystem = sld_ctx.video().unwrap();
@@ -114,15 +115,19 @@ fn main() {
         }
 
         canvas.set_draw_color(Color::BLACK);
+        let scale = Matrix4::from_scale(scale_state);
+        let translation = Matrix4::from_translation(translation_state);
+        let x_rot = Matrix4::from_angle_x(cgmath::Deg(rotation_state.x));
+        let y_rot = Matrix4::from_angle_y(cgmath::Deg(rotation_state.y));
+        let z_rot = Matrix4::from_angle_z(cgmath::Deg(rotation_state.z));
+        let rotation = z_rot * y_rot * x_rot;
 
+        let transform = translation * rotation * scale;
         for obj in &objects {
             let transformed = obj
-                .translate(translation_state)
-                .scale(scale_state)
-                .rotate(rotation_state.x, Axis::X)
-                .rotate(rotation_state.y, Axis::Y)
-                .rotate(rotation_state.z, Axis::Z)
-                .cast_2d(FOV, AR, NEAR, FAR);
+                .transform(transform)
+                .cast_2d(FOV, AR, NEAR, FAR)
+                .to_screen_coords(VW, VH);
             for line in transformed.edges {
                 let a = Point::new(
                     transformed.vertices[line[0] as usize].x as i32,

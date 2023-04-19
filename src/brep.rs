@@ -1,7 +1,8 @@
-use nalgebra::{Matrix4, Point3, Vector3};
+use cgmath::{Decomposed, Matrix4, Point3, Quaternion, Transform, Vector3};
 
+use crate::{AR, FOV, matrix_templates, VH, VW};
 use crate::enums::Axis;
-use crate::matrix_templates;
+use crate::matrix_templates::translation;
 
 #[derive(Debug)]
 pub struct Brep {
@@ -15,36 +16,43 @@ impl Brep {
     }
 
     pub fn translate(&self, v: Vector3<f64>) -> Brep {
-        let translation = matrix_templates::translation(v);
-        let v = self.transform_points(translation);
-        Brep::new(v, self.edges.clone())
-    }
-
-    pub fn scale(&self, scale: f64) -> Brep {
-        let scaling = matrix_templates::scaling(scale);
-        let v = self.transform_points(scaling);
-        Brep::new(v, self.edges.clone())
-    }
-
-    pub fn rotate(&self, rot: f64, axis: Axis) -> Brep {
-        let rotation = match axis {
-            Axis::X => matrix_templates::x_rotation(rot),
-            Axis::Y => matrix_templates::y_rotation(rot),
-            Axis::Z => matrix_templates::z_rotation(rot),
+        let transl = cgmath::Decomposed {
+            scale: 1.,
+            rot: Quaternion::new(1., 0., 0., 0.),
+            disp: v,
         };
-        let v = self.transform_points(rotation);
+        let v = self.vertices.iter()
+            .map(|v| transl.transform_point(*v))
+            .collect();
+        Brep::new(v, self.edges.clone())
+    }
+
+    pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Brep {
+        println!("Transformation");
+        let v = self.vertices.iter()
+            .map(|v| transform_matrix.transform_point(*v))
+            .collect();
         Brep::new(v, self.edges.clone())
     }
 
     pub fn cast_2d(&self, fov: f64, ar: f64, near: f64, far: f64) -> Brep {
-        let projection = matrix_templates::projection(fov, ar, near, far);
-        let v = self.transform_points(projection);
+        println!("Projection");
+        let projection = cgmath::perspective(cgmath::Deg(fov), ar, near, far);
+        let v = self.vertices.iter()
+            .map(|v| projection.transform_point(*v))
+            .collect();
         Brep::new(v, self.edges.clone())
     }
 
-    fn transform_points(&self, transform_matrix: Matrix4<f64>) -> Vec<Point3<f64>> {
-        self.vertices.iter()
-            .map(|v| Point3::from_homogeneous(transform_matrix * v.to_homogeneous()).unwrap())
-            .collect()
+    pub fn to_screen_coords(&self, vw: u32, vh: u32) -> Brep {
+        println!("Coord transformation");
+        let v = self.vertices.iter()
+            .map(|v| {
+                let x_screen = (v.x + 1.) * 0.5 * vw as f64;
+                let y_screen = (v.y + 1.) * 0.5 * vh as f64;
+                Point3::new(x_screen, y_screen, 0.)
+            })
+            .collect();
+        Brep::new(v, self.edges.clone())
     }
 }

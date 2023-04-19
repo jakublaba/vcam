@@ -1,13 +1,13 @@
-use nalgebra::{Point, point, Point3, vector};
+use cgmath::{Point3, Vector3};
 
 use crate::brep::Brep;
 
 pub fn generate_cubes() -> Vec<Brep> {
     let cube_positions = [
-        vector![0., 0., 0.],
-        vector![50., 0., 0.],
-        vector![0., 50., 0.],
-        vector![50., 50., 0.]
+        Vector3::new(0., 0., 0.),
+        Vector3::new(60., 0., 0.),
+        Vector3::new(0., 60., 0.),
+        Vector3::new(60., 60., 0.),
     ];
     let mut cubes = Vec::new();
     let template = cube_template();
@@ -21,14 +21,14 @@ pub fn generate_cubes() -> Vec<Brep> {
 fn cube_template() -> Brep {
     Brep {
         vertices: vec![
-            point![0.0, 0.0, 0.0],
-            point![50.0, 0.0, 0.0],
-            point![50.0, 50.0, 0.0],
-            point![0.0, 50.0, 0.0],
-            point![0.0, 0.0, 50.0],
-            point![50.0, 0.0, 50.0],
-            point![50.0, 50.0, 50.0],
-            point![0.0, 50.0, 50.0],
+            Point3::new(0.0, 0.0, 0.0),
+            Point3::new(50.0, 0.0, 0.0),
+            Point3::new(50.0, 50.0, 0.0),
+            Point3::new(0.0, 50.0, 0.0),
+            Point3::new(0.0, 0.0, 50.0),
+            Point3::new(50.0, 0.0, 50.0),
+            Point3::new(50.0, 50.0, 50.0),
+            Point3::new(0.0, 50.0, 50.0),
         ],
         edges: vec![
             [0, 1],

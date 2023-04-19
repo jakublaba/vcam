@@ -1,11 +1,13 @@
-use nalgebra::{Matrix4, Vector3};
+use std::f32::consts::PI;
+
+use cgmath::{Matrix4, Vector3};
 
 pub fn translation(v: Vector3<f64>) -> Matrix4<f64> {
     Matrix4::new(
-        1.,0.,0.,v.x,
-        0.,1.,0.,v.y,
-        0.,0.,1.,v.z,
-        0.,0.,0.,1.,
+        1., 0., 0., v.x,
+        0., 1., 0., v.y,
+        0., 0., 1., v.z,
+        0., 0., 0., 1.,
     )
 }
 
@@ -47,9 +49,9 @@ pub fn z_rotation(rot: f64) -> Matrix4<f64> {
 
 pub fn projection(fov: f64, ar: f64, near: f64, far: f64) -> Matrix4<f64> {
     Matrix4::new(
-        1. / (fov * ar * 0.5).tan(), 0., 0., 0.,
-        0., 1. / (fov / 2.).tan(), 0., 0.,
-        0., 0., -(far + near) / (far - near), -2. * far * near / (far - near),
+        1. / ((0.5 * fov).tan() * ar), 0., 0., 0.,
+        0., 1. / (0.5 * fov).tan(), 0., 0.,
+        0., 0., (far + near) / (near - far), 2. * far * near / (near - far),
         0., 0., -1., 0.,
     )
 }
