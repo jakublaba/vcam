@@ -1,16 +1,15 @@
 use cgmath::{Decomposed, Matrix4, Point3, Quaternion, Transform, Vector3};
 
 use crate::{AR, FOV, VH, VW};
-use crate::enums::Axis;
 
 #[derive(Debug)]
 pub struct Brep {
     pub vertices: Vec<Point3<f64>>,
-    pub edges: Vec<[i32; 2]>,
+    pub edges: Vec<(usize, usize)>,
 }
 
 impl Brep {
-    pub fn new(vertices: Vec<Point3<f64>>, edges: Vec<[i32; 2]>) -> Brep {
+    pub fn new(vertices: Vec<Point3<f64>>, edges: Vec<(usize, usize)>) -> Brep {
         Brep { vertices, edges }
     }
 
@@ -22,32 +21,34 @@ impl Brep {
         Brep::new(v, self.edges.clone())
     }
 
-    pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Brep {
-        println!("Transformation");
+    pub fn scale(&self, s: f64) -> Brep {
+        let scale = Matrix4::from_scale(s);
         let v = self.vertices.iter()
-            .map(|v| transform_matrix.transform_point(*v))
+            .map(|v| scale.transform_point(*v))
             .collect();
         Brep::new(v, self.edges.clone())
     }
 
-    pub fn cast_2d(&self, fov: f64, ar: f64, near: f64, far: f64) -> Brep {
+    pub fn transform(&mut self, transform_matrix: Matrix4<f64>) {
+        println!("Transformation");
+        for v in &mut self.vertices {
+            *v = transform_matrix.transform_point(*v);
+        }
+    }
+
+    pub fn cast_2d(&mut self, fov: f64, ar: f64, near: f64, far: f64) {
         println!("Projection");
         let projection = cgmath::perspective(cgmath::Deg(fov), ar, near, far);
-        let v = self.vertices.iter()
-            .map(|v| projection.transform_point(*v))
-            .collect();
-        Brep::new(v, self.edges.clone())
+        for v in &mut self.vertices {
+            *v = projection.transform_point(*v);
+        }
     }
 
-    pub fn to_screen_coords(&self, vw: u32, vh: u32) -> Brep {
+    pub fn screen_coords(&mut self, vw: u32, vh: u32) {
         println!("Coord transformation");
-        let v = self.vertices.iter()
-            .map(|v| {
-                let x_screen = (v.x + 1.) * 0.5 * vw as f64;
-                let y_screen = (v.y + 1.) * 0.5 * vh as f64;
-                Point3::new(x_screen, y_screen, 0.)
-            })
-            .collect();
-        Brep::new(v, self.edges.clone())
+        for v in &mut self.vertices {
+            v.x = (v.x + 1.) * 0.5 * vw as f64;
+            v.x = (v.y + 1.) * 0.5 * vh as f64;
+        }
     }
 }
