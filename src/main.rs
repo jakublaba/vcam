@@ -10,7 +10,6 @@ use crate::brep::Brep;
 use crate::enums::Axis;
 
 mod brep;
-mod matrix_templates;
 mod enums;
 mod cube_generator;
 

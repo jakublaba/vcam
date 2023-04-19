@@ -1,8 +1,7 @@
 use cgmath::{Decomposed, Matrix4, Point3, Quaternion, Transform, Vector3};
 
-use crate::{AR, FOV, matrix_templates, VH, VW};
+use crate::{AR, FOV, VH, VW};
 use crate::enums::Axis;
-use crate::matrix_templates::translation;
 
 #[derive(Debug)]
 pub struct Brep {
@@ -16,11 +15,7 @@ impl Brep {
     }
 
     pub fn translate(&self, v: Vector3<f64>) -> Brep {
-        let transl = cgmath::Decomposed {
-            scale: 1.,
-            rot: Quaternion::new(1., 0., 0., 0.),
-            disp: v,
-        };
+        let transl = Matrix4::from_translation(v);
         let v = self.vertices.iter()
             .map(|v| transl.transform_point(*v))
             .collect();
