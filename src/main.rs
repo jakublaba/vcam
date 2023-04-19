@@ -1,7 +1,4 @@
-use std::f64::consts::PI;
-use std::time::Duration;
-
-use cgmath::{Matrix4, Point3, Quaternion, Rotation3, Vector3};
+use cgmath::{Matrix4, Vector3};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;

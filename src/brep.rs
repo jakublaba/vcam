@@ -1,6 +1,4 @@
-use cgmath::{Decomposed, Matrix4, Point3, Quaternion, Transform, Vector3};
-
-use crate::{AR, FOV, VH, VW};
+use cgmath::{Matrix4, Point3, Transform, Vector3};
 
 #[derive(Debug)]
 pub struct Brep {

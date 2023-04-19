@@ -167,6 +167,7 @@ version = "0.1.0"
 dependencies = [
  "cgmath",
  "sdl2",
+ "sdl2-sys",
  "serde",
  "serde_json",
 ]
