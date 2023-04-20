@@ -4,7 +4,7 @@ Goal of this project is implementing a simple rendering engine, which allows mov
 
 The project consists of 3 iterations:
 
-1. Implement fundamental geometric transformations (translation, rotation, scaling) and implement objects as wireframes.
+1. Implement fundamental operations to allow observer to fully explore the world
 2. Implement elimination of covered elements (or in gamer words - drawing objects without wall hack)
 3. Implement lighting
 
@@ -28,13 +28,18 @@ The project consists of 3 iterations:
 | In   | Q   |
 | Out  | E   |
 
-### Looking around / rotations
+### Looking around
 
-| Rotation         | Axis | Key |
-|------------------|------|-----|
-| Clockwise        | X    | I   |
-| Counterclockwise | X    | K   |
-| Clockwise        | Y    | J   |
-| Counterclockwise | Y    | L   |
-| Clockwise        | Z    | O   |
-| Counterclockwise | Z    | U   |
+| Look direction | Key |
+|----------------|-----|
+| Up             | I   |
+| Down           | K   |
+| Left           | J   |
+| Right          | L   |
+
+### Tilting camera
+
+| Tilt direction | Key |
+|----------------|-----|
+| Left           | U   |
+| Right          | O   |
