@@ -11,14 +11,6 @@ impl Brep {
         Brep { vertices, edges }
     }
 
-    pub fn translate(&self, v: Vector3<f64>) -> Brep {
-        let transl = Matrix4::from_translation(v);
-        let v = self.vertices.iter()
-            .map(|v| transl.transform_point(*v))
-            .collect();
-        Brep::new(v, self.edges.clone())
-    }
-
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Brep {
         let v = self.vertices.iter()
             .map(|v| transform_matrix.transform_point(*v))

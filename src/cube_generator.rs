@@ -1,4 +1,4 @@
-use cgmath::{Point3, Vector3};
+use cgmath::{Matrix4, Point3, Vector3};
 
 use crate::brep::Brep;
 
@@ -12,7 +12,7 @@ pub fn generate_cubes() -> Vec<Brep> {
     let mut cubes = Vec::new();
     for position in cube_positions {
         let t = cube_template()
-            .translate(position);
+            .transform(Matrix4::from_translation(position));
         cubes.push(t);
     }
     cubes
