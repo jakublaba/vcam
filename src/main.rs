@@ -20,20 +20,16 @@ const NEAR: f64 = 0.1;
 const FAR: f64 = 100.;
 
 fn main() -> Result<(), String> {
-    let mut objects: Vec<Brep> = cube_generator::generate_cubes();
-    for o in &objects {
-        println!("{:?}", o)
-    }
+    let objects: Vec<Brep> = cube_generator::generate_cubes();
 
     let sdl_ctx = sdl2::init()?;
     let video_subsystem = sdl_ctx.video()?;
     let window = video_subsystem
         .window("Virtual Camera", VW, VH)
         .position_centered()
-        .resizable()
         .build()
         .map_err(|e| e.to_string())?;
-    
+
     let mut canvas = window
         .into_canvas()
         .accelerated()
@@ -120,7 +116,7 @@ fn main() -> Result<(), String> {
         let view = Matrix4::look_to_rh(position, direction, up);
 
         canvas.set_draw_color(Color::RED);
-        for obj in &mut objects {
+        for obj in &objects {
             let t = obj
                 .transform(view)
                 .project_2d(fov, AR, NEAR, FAR)
