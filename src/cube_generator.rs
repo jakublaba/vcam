@@ -8,6 +8,10 @@ pub fn generate_cubes() -> Vec<Brep> {
         Vector3::new(60., 0., 0.),
         Vector3::new(0., 60., 0.),
         Vector3::new(60., 60., 0.),
+        Vector3::new(0., 0., 60.),
+        Vector3::new(60., 0., 60.),
+        Vector3::new(0., 60., 60.),
+        Vector3::new(60., 60., 60.),
     ];
     let mut cubes = Vec::new();
     for position in cube_positions {
