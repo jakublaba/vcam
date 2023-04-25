@@ -1,4 +1,4 @@
-use cgmath::{Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Transform, Vector3};
+use cgmath::{Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -41,7 +41,7 @@ fn main() -> Result<(), String> {
     canvas.present();
 
     let mut position = Point3::new(0., 0., 0.);
-    let mut direction = Vector3::new(0., 0., 1.);
+    let mut forward = Vector3::new(0., 0., 1.);
     let mut fov = 45.;
     let mut up = Vector3::new(0., 1., 0.);
 
@@ -55,65 +55,65 @@ fn main() -> Result<(), String> {
                 Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => break 'running,
                 Event::KeyDown { keycode: Some(Keycode::W), .. } => {
                     // forward
-                    position += direction.normalize() * MOVE_STEP;
+                    position += forward.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::S), .. } => {
                     // backward
-                    position -= direction.normalize() * MOVE_STEP;
+                    position -= forward.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::A), .. } => {
                     // left
-                    position -= direction.cross(up).normalize() * MOVE_STEP;
+                    position -= forward.cross(up).normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::D), .. } => {
                     // right
-                    position += direction.cross(up).normalize() * MOVE_STEP;
+                    position += forward.cross(up).normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
                     // up
-                    position -= up.normalize() * MOVE_STEP;
+                    position += up.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
                     // down
-                    position += up.normalize() * MOVE_STEP;
+                    position -= up.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::Q), .. } => {
                     // zoom in
-                    if fov < 90. { fov += ZOOM_STEP; }
+                    if fov > 30. { fov -= ZOOM_STEP; }
                 }
                 Event::KeyDown { keycode: Some(Keycode::E), .. } => {
                     // zoom out
-                    if fov > 30. { fov -= ZOOM_STEP; }
+                    if fov < 90. { fov += ZOOM_STEP; }
                 }
                 Event::KeyDown { keycode: Some(Keycode::I), .. } => {
                     // look up
-                    direction = Matrix4::from_angle_x(Deg(LOOK_STEP)).transform_vector(direction);
+                    forward = Quaternion::from_axis_angle(forward.cross(up), Deg(LOOK_STEP)).rotate_vector(forward);
                 }
                 Event::KeyDown { keycode: Some(Keycode::K), .. } => {
                     // look down
-                    direction = Matrix4::from_angle_x(Deg(-LOOK_STEP)).transform_vector(direction);
+                    forward = Quaternion::from_axis_angle(forward.cross(up), Deg(-LOOK_STEP)).rotate_vector(forward);
                 }
                 Event::KeyDown { keycode: Some(Keycode::J), .. } => {
                     // look left
-                    direction = Quaternion::from_axis_angle(up, Deg(LOOK_STEP)).rotate_vector(direction);
+                    forward = Quaternion::from_axis_angle(up, Deg(LOOK_STEP)).rotate_vector(forward);
                 }
                 Event::KeyDown { keycode: Some(Keycode::L), .. } => {
                     // look right
-                    direction = Quaternion::from_axis_angle(up, Deg(-LOOK_STEP)).rotate_vector(direction);
+                    forward = Quaternion::from_axis_angle(up, Deg(-LOOK_STEP)).rotate_vector(forward);
                 }
                 Event::KeyDown { keycode: Some(Keycode::O), .. } => {
                     // tilt left
-                    up = Quaternion::from_axis_angle(direction, Deg(LOOK_STEP)).rotate_vector(up);
+                    up = Quaternion::from_axis_angle(forward, Deg(TILT_STEP)).rotate_vector(up);
                 }
                 Event::KeyDown { keycode: Some(Keycode::U), .. } => {
                     // tilt right
-                    up = Quaternion::from_axis_angle(direction, Deg(-LOOK_STEP)).rotate_vector(up);
+                    up = Quaternion::from_axis_angle(forward, Deg(-TILT_STEP)).rotate_vector(up);
                 }
                 _ => {}
             }
         }
 
-        let view = Matrix4::look_to_rh(position, direction, up);
+        let view = Matrix4::look_to_lh(position, forward, up);
 
         canvas.set_draw_color(Color::RED);
         for obj in &objects {

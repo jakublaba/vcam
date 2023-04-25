@@ -1,4 +1,4 @@
-use cgmath::{Deg, Matrix4, Point3, Transform, Vector3};
+use cgmath::{Deg, Matrix4, Point3, Transform};
 
 #[derive(Debug)]
 pub struct Brep {
