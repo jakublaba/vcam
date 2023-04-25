@@ -1,4 +1,4 @@
-use cgmath::{Deg, InnerSpace, Matrix4, Point3, Transform, Vector3};
+use cgmath::{Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Transform, Vector3};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -95,19 +95,19 @@ fn main() -> Result<(), String> {
                 }
                 Event::KeyDown { keycode: Some(Keycode::J), .. } => {
                     // look left
-                    direction = Matrix4::from_angle_y(Deg(LOOK_STEP)).transform_vector(direction);
+                    direction = Quaternion::from_axis_angle(up, Deg(LOOK_STEP)).rotate_vector(direction);
                 }
                 Event::KeyDown { keycode: Some(Keycode::L), .. } => {
                     // look right
-                    direction = Matrix4::from_angle_y(Deg(-LOOK_STEP)).transform_vector(direction);
+                    direction = Quaternion::from_axis_angle(up, Deg(-LOOK_STEP)).rotate_vector(direction);
                 }
                 Event::KeyDown { keycode: Some(Keycode::O), .. } => {
                     // tilt left
-                    up = Matrix4::from_angle_z(Deg(-TILT_STEP)).transform_vector(up);
+                    up = Quaternion::from_axis_angle(direction, Deg(LOOK_STEP)).rotate_vector(up);
                 }
                 Event::KeyDown { keycode: Some(Keycode::U), .. } => {
                     // tilt right
-                    up = Matrix4::from_angle_z(Deg(TILT_STEP)).transform_vector(up);
+                    up = Quaternion::from_axis_angle(direction, Deg(-LOOK_STEP)).rotate_vector(up);
                 }
                 _ => {}
             }
