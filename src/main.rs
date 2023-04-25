@@ -1,4 +1,4 @@
-use cgmath::{Deg, Matrix4, Point3, Transform, Vector3};
+use cgmath::{Deg, InnerSpace, Matrix4, Point3, Transform, Vector3};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -55,27 +55,27 @@ fn main() -> Result<(), String> {
                 Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => break 'running,
                 Event::KeyDown { keycode: Some(Keycode::W), .. } => {
                     // forward
-                    position.z += MOVE_STEP;
+                    position += direction.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::S), .. } => {
                     // backward
-                    position.z -= MOVE_STEP;
+                    position -= direction.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::A), .. } => {
                     // left
-                    position.x += MOVE_STEP;
+                    position -= direction.cross(up).normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::D), .. } => {
                     // right
-                    position.x -= MOVE_STEP;
+                    position += direction.cross(up).normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
                     // up
-                    position.y -= MOVE_STEP;
+                    position -= up.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
                     // down
-                    position.y += MOVE_STEP;
+                    position += up.normalize() * MOVE_STEP;
                 }
                 Event::KeyDown { keycode: Some(Keycode::Q), .. } => {
                     // zoom in
