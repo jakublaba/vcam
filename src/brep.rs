@@ -1,4 +1,4 @@
-use cgmath::{Deg, Matrix4, Point3, Transform};
+use cgmath::{Matrix4, Point3, Transform};
 
 #[derive(Debug)]
 pub struct Brep {
@@ -14,14 +14,6 @@ impl Brep {
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Brep {
         let v = self.vertices.iter()
             .map(|v| transform_matrix.transform_point(*v))
-            .collect();
-        Brep::new(v, self.edges.clone())
-    }
-
-    pub fn project_2d(&self, fov: f64, ar: f64, near: f64, far: f64) -> Brep {
-        let projection = cgmath::perspective(Deg(fov), ar, near, far);
-        let v = self.vertices.iter()
-            .map(|v| projection.transform_point(*v))
             .collect();
         Brep::new(v, self.edges.clone())
     }

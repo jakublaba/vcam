@@ -1,4 +1,4 @@
-use cgmath::{Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3};
+use cgmath::{Deg, InnerSpace, Matrix4, perspective, Point3, Quaternion, Rotation, Rotation3, Vector3};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -128,12 +128,13 @@ fn main() -> Result<(), String> {
         }
 
         let view = Matrix4::look_to_lh(position, forward, up);
+        let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
         canvas.set_draw_color(Color::BLACK);
         for obj in &objects {
             let t = obj
                 .transform(view)
-                .project_2d(fov, AR, NEAR, FAR)
+                .transform(projection)
                 .screen_coords(VW, VH);
             for line in &t.edges {
                 let a = Point::new(
