@@ -1,4 +1,6 @@
-use cgmath::{Deg, InnerSpace, Matrix4, perspective, Point3, Quaternion, Rotation, Rotation3, Vector3};
+use cgmath::{
+    perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
+};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
@@ -54,60 +56,114 @@ fn main() -> Result<(), String> {
 
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit { .. } | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => break 'running,
-                Event::KeyDown { keycode: Some(Keycode::W), .. } => {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
+                Event::KeyDown {
+                    keycode: Some(Keycode::W),
+                    ..
+                } => {
                     // forward
                     position += forward.normalize() * MOVE_STEP;
                 }
-                Event::KeyDown { keycode: Some(Keycode::S), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::S),
+                    ..
+                } => {
                     // backward
                     position -= forward.normalize() * MOVE_STEP;
                 }
-                Event::KeyDown { keycode: Some(Keycode::A), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::A),
+                    ..
+                } => {
                     // left
                     position -= forward.cross(up).normalize() * MOVE_STEP;
                 }
-                Event::KeyDown { keycode: Some(Keycode::D), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::D),
+                    ..
+                } => {
                     // right
                     position += forward.cross(up).normalize() * MOVE_STEP;
                 }
-                Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::Up),
+                    ..
+                } => {
                     // up
                     position += up.normalize() * MOVE_STEP;
                 }
-                Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::Down),
+                    ..
+                } => {
                     // down
                     position -= up.normalize() * MOVE_STEP;
                 }
-                Event::KeyDown { keycode: Some(Keycode::Q), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::Q),
+                    ..
+                } => {
                     // zoom in
-                    if fov > 30. { fov -= ZOOM_STEP; }
+                    if fov > 30. {
+                        fov -= ZOOM_STEP;
+                    }
                 }
-                Event::KeyDown { keycode: Some(Keycode::E), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::E),
+                    ..
+                } => {
                     // zoom out
-                    if fov < 90. { fov += ZOOM_STEP; }
+                    if fov < 90. {
+                        fov += ZOOM_STEP;
+                    }
                 }
-                Event::KeyDown { keycode: Some(Keycode::I), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::I),
+                    ..
+                } => {
                     // look up
-                    forward = Quaternion::from_axis_angle(forward.cross(up), Deg(LOOK_STEP)).rotate_vector(forward);
+                    forward = Quaternion::from_axis_angle(forward.cross(up), Deg(LOOK_STEP))
+                        .rotate_vector(forward);
                 }
-                Event::KeyDown { keycode: Some(Keycode::K), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::K),
+                    ..
+                } => {
                     // look down
-                    forward = Quaternion::from_axis_angle(forward.cross(up), Deg(-LOOK_STEP)).rotate_vector(forward);
+                    forward = Quaternion::from_axis_angle(forward.cross(up), Deg(-LOOK_STEP))
+                        .rotate_vector(forward);
                 }
-                Event::KeyDown { keycode: Some(Keycode::J), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::J),
+                    ..
+                } => {
                     // look left
-                    forward = Quaternion::from_axis_angle(up, Deg(LOOK_STEP)).rotate_vector(forward);
+                    forward =
+                        Quaternion::from_axis_angle(up, Deg(LOOK_STEP)).rotate_vector(forward);
                 }
-                Event::KeyDown { keycode: Some(Keycode::L), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::L),
+                    ..
+                } => {
                     // look right
-                    forward = Quaternion::from_axis_angle(up, Deg(-LOOK_STEP)).rotate_vector(forward);
+                    forward =
+                        Quaternion::from_axis_angle(up, Deg(-LOOK_STEP)).rotate_vector(forward);
                 }
-                Event::KeyDown { keycode: Some(Keycode::O), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::O),
+                    ..
+                } => {
                     // tilt left
                     up = Quaternion::from_axis_angle(forward, Deg(TILT_STEP)).rotate_vector(up);
                 }
-                Event::KeyDown { keycode: Some(Keycode::U), .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::U),
+                    ..
+                } => {
                     // tilt right
                     up = Quaternion::from_axis_angle(forward, Deg(-TILT_STEP)).rotate_vector(up);
                 }
@@ -117,7 +173,8 @@ fn main() -> Result<(), String> {
 
         if tick == ANIMATION_INTERVAL {
             // some attempt at animating rotation
-            objects = objects.iter()
+            objects = objects
+                .iter()
                 .map(|o| {
                     let rot_x = Matrix4::from_angle_x(Deg(3.));
                     let rot_y = Matrix4::from_angle_y(Deg(3.));
@@ -137,14 +194,8 @@ fn main() -> Result<(), String> {
                 .transform(projection)
                 .screen_coords(VW, VH);
             for line in &t.edges {
-                let a = Point::new(
-                    t.vertices[line.0].x as i32,
-                    t.vertices[line.0].y as i32,
-                );
-                let b = Point::new(
-                    t.vertices[line.1].x as i32,
-                    t.vertices[line.1].y as i32,
-                );
+                let a = Point::new(t.vertices[line.0].x as i32, t.vertices[line.0].y as i32);
+                let b = Point::new(t.vertices[line.1].x as i32, t.vertices[line.1].y as i32);
 
                 canvas.draw_line(a, b)?;
             }
@@ -157,7 +208,7 @@ fn main() -> Result<(), String> {
         } else {
             tick = 0;
         }
-    };
+    }
 
     Ok(())
 }
