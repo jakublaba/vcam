@@ -1,4 +1,4 @@
-use cgmath::Matrix4;
+use cgmath::{Matrix4, Point3};
 
 use crate::polygon::Polygon;
 
@@ -8,12 +8,22 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(polygons: Vec<Polygon>) -> Scene {
-        Scene { polygons }
+    pub fn new(polygons: Vec<Polygon>) -> Self {
+        Self { polygons }
     }
 
     pub fn polygons(&self) -> Vec<Polygon> {
         self.polygons.clone()
+    }
+
+    pub fn clip(&self, pos: Point3<f64>, near: f64, far: f64) -> Scene {
+        let polygons_clipped = self
+            .polygons
+            .iter()
+            .filter(|p| p.is_visible(pos, near, far))
+            .map(|p| p.clone())
+            .collect();
+        Scene::new(polygons_clipped)
     }
 
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Scene {
@@ -25,11 +35,11 @@ impl Scene {
         Scene::new(polygons_transformed)
     }
 
-    pub fn projected_to_view(&self, vw: u32, vh: u32) -> Scene {
+    pub fn screen_coords(&self, vw: u32, vh: u32) -> Scene {
         let projected_polygons = self
             .polygons
             .iter()
-            .map(|p| p.project_to_view(vw, vh))
+            .map(|p| p.screen_coords(vw, vh))
             .collect();
 
         Scene::new(projected_polygons)
