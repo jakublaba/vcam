@@ -8,8 +8,8 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(polygons: Vec<Polygon>) -> Scene {
-        Scene { polygons }
+    pub fn new(polygons: Vec<Polygon>) -> Self {
+        Self { polygons }
     }
 
     pub fn polygons(&self) -> Vec<Polygon> {
@@ -25,11 +25,11 @@ impl Scene {
         Scene::new(polygons_transformed)
     }
 
-    pub fn projected_to_view(&self, vw: u32, vh: u32) -> Scene {
+    pub fn screen_coords(&self, vw: u32, vh: u32) -> Scene {
         let projected_polygons = self
             .polygons
             .iter()
-            .map(|p| p.project_to_view(vw, vh))
+            .map(|p| p.screen_coords(vw, vh))
             .collect();
 
         Scene::new(projected_polygons)

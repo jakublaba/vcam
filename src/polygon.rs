@@ -7,12 +7,12 @@ pub struct Polygon {
 }
 
 impl Polygon {
-    pub fn from_vertices(vertices: Vec<vertex::Vertex>) -> Polygon {
+    pub fn from_vertices(vertices: Vec<vertex::Vertex>) -> Self {
         let mut edges = Vec::new();
         for i in 0..vertices.len() {
             edges.push(Edge::new(vertices[i], vertices[(i + 1) % vertices.len()]));
         }
-        Polygon { vertices, edges }
+        Self { vertices, edges }
     }
 
     pub fn vertices(&self) -> Vec<vertex::Vertex> {
@@ -32,11 +32,11 @@ impl Polygon {
         Polygon::from_vertices(v)
     }
 
-    pub fn project_to_view(&self, vw: u32, vh: u32) -> Polygon {
+    pub fn screen_coords(&self, vw: u32, vh: u32) -> Polygon {
         let v = self
             .vertices
             .iter()
-            .map(|v| v.project_to_view(vw, vh))
+            .map(|v| v.screen_coords(vw, vh))
             .collect();
 
         Polygon::from_vertices(v)

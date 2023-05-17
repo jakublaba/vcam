@@ -179,7 +179,7 @@ fn main() -> Result<(), String> {
         let projected_scene = scene
             .transform(view)
             .transform(projection)
-            .projected_to_view(VW, VH);
+            .screen_coords(VW, VH);
 
         canvas.set_draw_color(Color::BLACK);
         for poly in &projected_scene.polygons() {

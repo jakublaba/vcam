@@ -6,12 +6,12 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    pub fn from_point3(position: Point3<f64>) -> Vertex {
-        Vertex { position }
+    pub fn from_point3(position: Point3<f64>) -> Self {
+        Self { position }
     }
 
-    pub fn new(x: f64, y: f64, z: f64) -> Vertex {
-        Vertex {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self {
             position: Point3::new(x, y, z),
         }
     }
@@ -36,7 +36,7 @@ impl Vertex {
         Vertex::from_point3(transform_matrix.transform_point(self.position))
     }
 
-    pub fn project_to_view(&self, vw: u32, vh: u32) -> Vertex {
+    pub fn screen_coords(&self, vw: u32, vh: u32) -> Vertex {
         let x = (self.x() + 1.) * 0.5 * vw as f64;
         let y = (self.y() + 1.) * 0.5 * vh as f64;
         let z = 0.;
