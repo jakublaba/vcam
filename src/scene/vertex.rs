@@ -16,10 +16,6 @@ impl Vertex {
         }
     }
 
-    pub fn position(&self) -> Point3<f64> {
-        self.position.clone()
-    }
-
     pub fn x(&self) -> f64 {
         self.position.x.clone()
     }
