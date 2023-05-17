@@ -16,8 +16,8 @@ impl Polygon {
         Self { vertices, edges }
     }
 
-    pub fn edges(&self) -> Vec<Edge> {
-        self.edges.clone()
+    pub fn vertices(&self) -> Vec<Vertex> {
+        self.vertices.clone()
     }
 
     pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
@@ -59,10 +59,6 @@ pub struct Edge {
 impl Edge {
     pub fn new(v1: Vertex, v2: Vertex) -> Edge {
         Edge { v1, v2 }
-    }
-
-    pub fn vertices(&self) -> (Vertex, Vertex) {
-        (self.v1, self.v2)
     }
 
     pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {

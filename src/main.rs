@@ -7,9 +7,12 @@ use cgmath::{
 use log::Level;
 use obj::read_polygons_from_obj;
 use sdl2::event::Event;
+use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
-use sdl2::rect::Point;
+
+use crate::scene::polygon::Polygon;
+use crate::scene::Scene;
 
 mod cube_generator;
 mod obj;
@@ -207,14 +210,13 @@ fn main() -> Result<(), String> {
 
         canvas.set_draw_color(Color::BLACK);
         for poly in &projected_scene.polygons() {
-            poly.edges().iter().for_each(|edge| {
-                let (a_vertex, b_vertex) = edge.vertices();
-
-                let a = Point::new(a_vertex.x() as i32, a_vertex.y() as i32);
-                let b = Point::new(b_vertex.x() as i32, b_vertex.y() as i32);
-
-                canvas.draw_line(a, b).unwrap();
-            });
+            // TODO: Improve this flow
+            let vertices = poly.vertices();
+            let vx_vec: Vec<i16> = vertices.iter().map(|v| v.position().x as i16).collect();
+            let vy_vec: Vec<i16> = vertices.iter().map(|v| v.position().y as i16).collect();
+            let vx: &[i16] = &vx_vec;
+            let vy: &[i16] = &vy_vec;
+            canvas.filled_polygon(vx, vy, Color::BLUE).unwrap();
         }
 
         canvas.present();
