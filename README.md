@@ -23,10 +23,11 @@ The project consists of 3 iterations:
 
 ### Zoom
 
-| Zoom | Key |
-|------|-----|
-| In   | Q   |
-| Out  | E   |
+| Zoom  | Key   |
+|-------|-------|
+| In    | Q     |
+| Out   | E     |
+| Reset | Space |
 
 ### Looking around
 

@@ -1,32 +1,40 @@
 use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
+use log::Level;
+use polygon::Polygon;
+use scene::Scene;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 
-use crate::brep::Brep;
-
-mod brep;
 mod cube_generator;
+mod polygon;
+mod scene;
+mod vertex;
 
-const VW: u32 = 1920;
-const VH: u32 = 1080;
+const VW: u32 = 800;
+const VH: u32 = 600;
 const MOVE_STEP: f64 = 10.;
-const LOOK_STEP: f64 = 10.;
+const LOOK_STEP: f64 = 2.5;
 const ZOOM_STEP: f64 = 5.;
 const TILT_STEP: f64 = 5.;
 const AR: f64 = (VW / VH) as f64;
-const NEAR: f64 = 1.;
-const FAR: f64 = 100.;
-const ANIMATION_INTERVAL: i32 = 5;
+const NEAR: f64 = 30.;
+const FAR: f64 = 300.;
+const FOV_MIN: f64 = 30.;
+const FOV_MAX: f64 = 90.;
+const FOV_DEFAULT: f64 = (FOV_MIN + FOV_MAX) / 2.;
 
 fn main() -> Result<(), String> {
-    let mut objects: Vec<Brep> = cube_generator::generate_cubes();
+    simple_logger::init_with_level(Level::Debug).map_err(|e| e.to_string())?;
+    let objects: Vec<Polygon> = cube_generator::generate_cubes();
 
-    let sdl_ctx = sdl2::init()?;
-    let video_subsystem = sdl_ctx.video()?;
+    let scene = Scene::new(objects);
+
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
         .window("Virtual Camera", VW, VH)
         .position_centered()
@@ -45,11 +53,10 @@ fn main() -> Result<(), String> {
 
     let mut position = Point3::new(0., 0., 0.);
     let mut forward = Vector3::new(0., 0., 1.);
-    let mut fov = 45.;
+    let mut fov = FOV_DEFAULT;
     let mut up = Vector3::new(0., 1., 0.);
 
-    let mut tick = 0;
-    let mut event_pump = sdl_ctx.event_pump()?;
+    let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
         canvas.set_draw_color(Color::WHITE);
         canvas.clear();
@@ -108,7 +115,7 @@ fn main() -> Result<(), String> {
                     ..
                 } => {
                     // zoom in
-                    if fov > 30. {
+                    if fov > FOV_MIN {
                         fov -= ZOOM_STEP;
                     }
                 }
@@ -117,9 +124,16 @@ fn main() -> Result<(), String> {
                     ..
                 } => {
                     // zoom out
-                    if fov < 90. {
+                    if fov < FOV_MAX {
                         fov += ZOOM_STEP;
                     }
+                }
+                Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    ..
+                } => {
+                    // reset zoom
+                    fov = FOV_DEFAULT
                 }
                 Event::KeyDown {
                     keycode: Some(Keycode::I),
@@ -171,43 +185,34 @@ fn main() -> Result<(), String> {
             }
         }
 
-        if tick == ANIMATION_INTERVAL {
-            // some attempt at animating rotation
-            objects = objects
-                .iter()
-                .map(|o| {
-                    let rot_x = Matrix4::from_angle_x(Deg(3.));
-                    let rot_y = Matrix4::from_angle_y(Deg(3.));
-                    let rot_z = Matrix4::from_angle_z(Deg(3.));
-                    o.transform(rot_z * rot_y * rot_x)
-                })
-                .collect();
-        }
-
         let view = Matrix4::look_to_lh(position, forward, up);
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
-        canvas.set_draw_color(Color::BLACK);
-        for obj in &objects {
-            let t = obj
-                .transform(view)
-                .transform(projection)
-                .screen_coords(VW, VH);
-            for line in &t.edges {
-                let a = Point::new(t.vertices[line.0].x as i32, t.vertices[line.0].y as i32);
-                let b = Point::new(t.vertices[line.1].x as i32, t.vertices[line.1].y as i32);
+        let projected_scene = scene
+            .clip(position, NEAR, FAR)
+            .transform(view)
+            .transform(projection)
+            .screen_coords(VW, VH);
 
-                canvas.draw_line(a, b)?;
-            }
+        canvas.set_draw_color(Color::BLACK);
+        for poly in &projected_scene.polygons() {
+            poly.edges().iter().for_each(|edge| {
+                let (a_vertex, b_vertex) = edge.vertices();
+
+                log::debug!("a_vertex: x{} y{}", a_vertex.x(), a_vertex.y());
+                log::debug!("b_vertex: x{} y{}", b_vertex.x(), b_vertex.y());
+
+                let a = Point::new(a_vertex.x() as i32, a_vertex.y() as i32);
+                let b = Point::new(b_vertex.x() as i32, b_vertex.y() as i32);
+
+                log::debug!("a: x{} y{}", a.x(), a.y());
+                log::debug!("b: x{} y{}", b.x(), b.y());
+
+                canvas.draw_line(a, b).unwrap();
+            });
         }
 
         canvas.present();
-
-        if tick < ANIMATION_INTERVAL {
-            tick += 1;
-        } else {
-            tick = 0;
-        }
     }
 
     Ok(())
