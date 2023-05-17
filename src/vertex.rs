@@ -40,6 +40,11 @@ impl Vertex {
         let x = (self.x() + 1.) * 0.5 * vw as f64;
         let y = (self.y() + 1.) * 0.5 * vh as f64;
         let z = 0.;
+
+        println!("project_to_view");
+        println!("self x: {}, y: {}, z: {}", self.x(), self.y(), self.z());
+        println!("x: {}, y: {}, z: {}", x, y, z);
+
         Vertex::new(x, y, z)
     }
 }

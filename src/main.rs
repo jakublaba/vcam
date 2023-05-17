@@ -8,7 +8,6 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 
-mod brep;
 mod cube_generator;
 mod polygon;
 mod scene;
