@@ -1,15 +1,18 @@
+use std::time::Duration;
+
+use crate::scene::Scene;
 use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
 use log::Level;
+use obj::read_polygons_from_obj;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
-use crate::scene::polygon::Polygon;
-use crate::scene::Scene;
 
 mod cube_generator;
+mod obj;
 mod scene;
 
 const VW: u32 = 800;
@@ -19,17 +22,27 @@ const LOOK_STEP: f64 = 2.5;
 const ZOOM_STEP: f64 = 5.;
 const TILT_STEP: f64 = 5.;
 const AR: f64 = (VW / VH) as f64;
-const NEAR: f64 = 30.;
+const NEAR: f64 = 1.;
 const FAR: f64 = 300.;
 const FOV_MIN: f64 = 30.;
 const FOV_MAX: f64 = 90.;
 const FOV_DEFAULT: f64 = (FOV_MIN + FOV_MAX) / 2.;
+const SCALE: f64 = 10.;
 
 fn main() -> Result<(), String> {
     simple_logger::init_with_level(Level::Debug).map_err(|e| e.to_string())?;
-    let objects: Vec<Polygon> = cube_generator::generate_cubes();
 
-    let scene = Scene::new(objects);
+    let file = std::env::args().nth(1).ok_or("Missing obj file");
+
+    let objects = match file {
+        Ok(file) => read_polygons_from_obj(&file)?,
+        Err(_) => {
+            log::info!("No obj file provided, generating cubes...");
+            cube_generator::generate_cubes()
+        }
+    };
+
+    let scene = Scene::new(objects).transform(Matrix4::from_scale(SCALE));
 
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -197,20 +210,15 @@ fn main() -> Result<(), String> {
             poly.edges().iter().for_each(|edge| {
                 let (a_vertex, b_vertex) = edge.vertices();
 
-                log::debug!("a_vertex: x{} y{}", a_vertex.x(), a_vertex.y());
-                log::debug!("b_vertex: x{} y{}", b_vertex.x(), b_vertex.y());
-
                 let a = Point::new(a_vertex.x() as i32, a_vertex.y() as i32);
                 let b = Point::new(b_vertex.x() as i32, b_vertex.y() as i32);
-
-                log::debug!("a: x{} y{}", a.x(), a.y());
-                log::debug!("b: x{} y{}", b.x(), b.y());
 
                 canvas.draw_line(a, b).unwrap();
             });
         }
 
         canvas.present();
+        std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 
     Ok(())

@@ -1,5 +1,5 @@
-use cgmath::Point3;
 use crate::scene::vertex::Vertex;
+use cgmath::Point3;
 
 #[derive(Debug, Clone)]
 pub struct Polygon {
@@ -14,10 +14,6 @@ impl Polygon {
             edges.push(Edge::new(vertices[i], vertices[(i + 1) % vertices.len()]));
         }
         Self { vertices, edges }
-    }
-
-    pub fn vertices(&self) -> Vec<Vertex> {
-        self.vertices.clone()
     }
 
     pub fn edges(&self) -> Vec<Edge> {
