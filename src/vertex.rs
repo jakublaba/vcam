@@ -32,6 +32,11 @@ impl Vertex {
         self.position.z.clone()
     }
 
+    pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
+        let clip_range = (pos.z + near)..=(pos.z + far);
+        clip_range.contains(&self.position.z)
+    }
+
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Vertex {
         Vertex::from_point3(transform_matrix.transform_point(self.position))
     }

@@ -1,3 +1,4 @@
+use cgmath::Point3;
 use crate::vertex;
 
 #[derive(Debug, Clone)]
@@ -23,6 +24,15 @@ impl Polygon {
         self.edges.clone()
     }
 
+    pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
+        for e in &self.edges {
+            if !e.is_visible(pos, near, far) {
+                return false;
+            }
+        }
+        true
+    }
+
     pub fn transform(&self, transform_matrix: cgmath::Matrix4<f64>) -> Polygon {
         let v = self
             .vertices
@@ -45,6 +55,7 @@ impl Polygon {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Edge {
+    // TODO - improve implementation to avoid storing duplicate vertices
     v1: vertex::Vertex,
     v2: vertex::Vertex,
 }
@@ -56,5 +67,10 @@ impl Edge {
 
     pub fn vertices(&self) -> (vertex::Vertex, vertex::Vertex) {
         (self.v1, self.v2)
+    }
+
+    pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
+        let clip_range = (pos.z + near)..=(pos.z + far);
+        clip_range.contains(&self.v1.z()) && clip_range.contains(&self.v2.z())
     }
 }

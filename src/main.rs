@@ -177,6 +177,7 @@ fn main() -> Result<(), String> {
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
         let projected_scene = scene
+            .clip(position, NEAR, FAR)
             .transform(view)
             .transform(projection)
             .screen_coords(VW, VH);

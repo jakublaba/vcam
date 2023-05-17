@@ -1,4 +1,4 @@
-use cgmath::Matrix4;
+use cgmath::{Matrix4, Point3};
 
 use crate::polygon::Polygon;
 
@@ -14,6 +14,16 @@ impl Scene {
 
     pub fn polygons(&self) -> Vec<Polygon> {
         self.polygons.clone()
+    }
+
+    pub fn clip(&self, pos: Point3<f64>, near: f64, far: f64) -> Scene {
+        let polygons_clipped = self
+            .polygons
+            .iter()
+            .filter(|p| p.is_visible(pos, near, far))
+            .map(|p| p.clone())
+            .collect();
+        Scene::new(polygons_clipped)
     }
 
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Scene {
