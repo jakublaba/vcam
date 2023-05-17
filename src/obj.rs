@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufRead, io::BufReader};
 
-use crate::{vertex::Vertex, Polygon};
+use crate::scene::{polygon::Polygon, vertex::Vertex};
 
 pub fn read_polygons_from_obj(path: &str) -> Result<Vec<Polygon>, String> {
     let mut polygons = vec![];

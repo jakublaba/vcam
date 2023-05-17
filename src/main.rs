@@ -1,17 +1,18 @@
 use std::time::Duration;
 
+use crate::scene::Scene;
 use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
 use log::Level;
+use obj::read_polygons_from_obj;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
-use crate::scene::polygon::Polygon;
-use crate::scene::Scene;
 
 mod cube_generator;
+mod obj;
 mod scene;
 
 const VW: u32 = 800;
