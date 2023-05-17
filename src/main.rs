@@ -1,16 +1,18 @@
 use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
+use polygon::Polygon;
+use scene::Scene;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
 
-use crate::brep::Brep;
-
 mod brep;
 mod cube_generator;
 mod polygon;
+mod scene;
+mod vertex;
 
 const VW: u32 = 800;
 const VH: u32 = 600;
@@ -23,10 +25,12 @@ const NEAR: f64 = 1.;
 const FAR: f64 = 100.;
 
 fn main() -> Result<(), String> {
-    let objects: Vec<Brep> = cube_generator::generate_cubes();
+    let objects: Vec<Polygon> = cube_generator::generate_cubes();
 
-    let sdl_ctx = sdl2::init()?;
-    let video_subsystem = sdl_ctx.video()?;
+    let scene = Scene::new(objects);
+
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
         .window("Virtual Camera", VW, VH)
         .position_centered()
@@ -48,7 +52,7 @@ fn main() -> Result<(), String> {
     let mut fov = 45.;
     let mut up = Vector3::new(0., 1., 0.);
 
-    let mut event_pump = sdl_ctx.event_pump()?;
+    let mut event_pump = sdl_context.event_pump()?;
     'running: loop {
         canvas.set_draw_color(Color::WHITE);
         canvas.clear();
@@ -173,18 +177,27 @@ fn main() -> Result<(), String> {
         let view = Matrix4::look_to_lh(position, forward, up);
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
-        canvas.set_draw_color(Color::BLACK);
-        for obj in &objects {
-            let t = obj
-                .transform(view)
-                .transform(projection)
-                .screen_coords(VW, VH);
-            for line in &t.edges {
-                let a = Point::new(t.vertices[line.0].x as i32, t.vertices[line.0].y as i32);
-                let b = Point::new(t.vertices[line.1].x as i32, t.vertices[line.1].y as i32);
+        let projected_scene = scene
+            .transform(view)
+            .transform(projection)
+            .projected_to_view(VW, VH);
 
-                canvas.draw_line(a, b)?;
-            }
+        canvas.set_draw_color(Color::BLACK);
+        for poly in &projected_scene.polygons() {
+            poly.edges().iter().for_each(|edge| {
+                let (a_vertex, b_vertex) = edge.vertices();
+
+                println!("a_vertex: x{} y{}", a_vertex.x(), a_vertex.y());
+                println!("b_vertex: x{} y{}", b_vertex.x(), b_vertex.y());
+
+                let a = Point::new(a_vertex.x() as i32, a_vertex.y() as i32);
+                let b = Point::new(b_vertex.x() as i32, b_vertex.y() as i32);
+
+                println!("a: x{} y{}", a.x(), a.y());
+                println!("b: x{} y{}", b.x(), b.y());
+
+                canvas.draw_line(a, b).unwrap();
+            });
         }
 
         canvas.present();
