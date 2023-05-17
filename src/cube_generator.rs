@@ -15,8 +15,7 @@ pub fn generate_cubes() -> Vec<Brep> {
     ];
     let mut cubes = Vec::new();
     for position in cube_positions {
-        let t = cube_template()
-            .transform(Matrix4::from_translation(position));
+        let t = cube_template().transform(Matrix4::from_translation(position));
         cubes.push(t);
     }
     cubes
@@ -50,4 +49,3 @@ fn cube_template() -> Brep {
         ],
     }
 }
-

@@ -10,20 +10,20 @@ use crate::brep::Brep;
 
 mod brep;
 mod cube_generator;
+mod polygon;
 
-const VW: u32 = 1920;
-const VH: u32 = 1080;
+const VW: u32 = 800;
+const VH: u32 = 600;
 const MOVE_STEP: f64 = 10.;
-const LOOK_STEP: f64 = 10.;
+const LOOK_STEP: f64 = 2.5;
 const ZOOM_STEP: f64 = 5.;
 const TILT_STEP: f64 = 5.;
 const AR: f64 = (VW / VH) as f64;
 const NEAR: f64 = 1.;
 const FAR: f64 = 100.;
-const ANIMATION_INTERVAL: i32 = 5;
 
 fn main() -> Result<(), String> {
-    let mut objects: Vec<Brep> = cube_generator::generate_cubes();
+    let objects: Vec<Brep> = cube_generator::generate_cubes();
 
     let sdl_ctx = sdl2::init()?;
     let video_subsystem = sdl_ctx.video()?;
@@ -48,7 +48,6 @@ fn main() -> Result<(), String> {
     let mut fov = 45.;
     let mut up = Vector3::new(0., 1., 0.);
 
-    let mut tick = 0;
     let mut event_pump = sdl_ctx.event_pump()?;
     'running: loop {
         canvas.set_draw_color(Color::WHITE);
@@ -171,19 +170,6 @@ fn main() -> Result<(), String> {
             }
         }
 
-        if tick == ANIMATION_INTERVAL {
-            // some attempt at animating rotation
-            objects = objects
-                .iter()
-                .map(|o| {
-                    let rot_x = Matrix4::from_angle_x(Deg(3.));
-                    let rot_y = Matrix4::from_angle_y(Deg(3.));
-                    let rot_z = Matrix4::from_angle_z(Deg(3.));
-                    o.transform(rot_z * rot_y * rot_x)
-                })
-                .collect();
-        }
-
         let view = Matrix4::look_to_lh(position, forward, up);
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
@@ -202,12 +188,6 @@ fn main() -> Result<(), String> {
         }
 
         canvas.present();
-
-        if tick < ANIMATION_INTERVAL {
-            tick += 1;
-        } else {
-            tick = 0;
-        }
     }
 
     Ok(())

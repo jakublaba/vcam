@@ -12,19 +12,25 @@ impl Brep {
     }
 
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Brep {
-        let v = self.vertices.iter()
+        let v = self
+            .vertices
+            .iter()
             .map(|v| transform_matrix.transform_point(*v))
             .collect();
         Brep::new(v, self.edges.clone())
     }
 
     pub fn screen_coords(&self, vw: u32, vh: u32) -> Brep {
-        let v = self.vertices.iter()
-            .map(|v| Point3::new(
-                (v.x + 1.) * 0.5 * vw as f64,
-                (v.y + 1.) * 0.5 * vh as f64,
-                0.,
-            ))
+        let v = self
+            .vertices
+            .iter()
+            .map(|v| {
+                Point3::new(
+                    (v.x + 1.) * 0.5 * vw as f64,
+                    (v.y + 1.) * 0.5 * vh as f64,
+                    0.,
+                )
+            })
             .collect();
         Brep::new(v, self.edges.clone())
     }
