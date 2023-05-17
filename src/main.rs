@@ -26,6 +26,7 @@ const FAR: f64 = 300.;
 const FOV_MIN: f64 = 30.;
 const FOV_MAX: f64 = 90.;
 const FOV_DEFAULT: f64 = (FOV_MIN + FOV_MAX) / 2.;
+const SCALE: f64 = 10.;
 
 fn main() -> Result<(), String> {
     simple_logger::init_with_level(Level::Debug).map_err(|e| e.to_string())?;
@@ -40,7 +41,7 @@ fn main() -> Result<(), String> {
         }
     };
 
-    let scene = Scene::new(objects).transform(Matrix4::from_scale(10.));
+    let scene = Scene::new(objects).transform(Matrix4::from_scale(SCALE));
 
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
