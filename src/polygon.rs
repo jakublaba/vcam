@@ -1,5 +1,5 @@
-use cgmath::Point3;
 use crate::vertex;
+use cgmath::Point3;
 
 #[derive(Debug, Clone)]
 pub struct Polygon {

@@ -28,8 +28,7 @@ const FOV_MAX: f64 = 90.;
 const FOV_DEFAULT: f64 = (FOV_MIN + FOV_MAX) / 2.;
 
 fn main() -> Result<(), String> {
-    simple_logger::init_with_level(Level::Debug)
-        .map_err(|e| e.to_string())?;
+    simple_logger::init_with_level(Level::Debug).map_err(|e| e.to_string())?;
     let objects: Vec<Polygon> = cube_generator::generate_cubes();
 
     let scene = Scene::new(objects);
