@@ -2,17 +2,15 @@ use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
 use log::Level;
-use polygon::Polygon;
-use scene::Scene;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
+use crate::scene::polygon::Polygon;
+use crate::scene::Scene;
 
 mod cube_generator;
-mod polygon;
 mod scene;
-mod vertex;
 
 const VW: u32 = 800;
 const VH: u32 = 600;

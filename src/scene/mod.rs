@@ -1,6 +1,9 @@
+pub(crate) mod polygon;
+pub(crate) mod vertex;
+
 use cgmath::{Matrix4, Point3};
 
-use crate::polygon::Polygon;
+use crate::scene::polygon::Polygon;
 
 #[derive(Debug)]
 pub struct Scene {

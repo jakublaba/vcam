@@ -1,14 +1,14 @@
-use crate::vertex;
 use cgmath::Point3;
+use crate::scene::vertex::Vertex;
 
 #[derive(Debug, Clone)]
 pub struct Polygon {
-    vertices: Vec<vertex::Vertex>,
+    vertices: Vec<Vertex>,
     edges: Vec<Edge>,
 }
 
 impl Polygon {
-    pub fn from_vertices(vertices: Vec<vertex::Vertex>) -> Self {
+    pub fn from_vertices(vertices: Vec<Vertex>) -> Self {
         let mut edges = Vec::new();
         for i in 0..vertices.len() {
             edges.push(Edge::new(vertices[i], vertices[(i + 1) % vertices.len()]));
@@ -16,7 +16,7 @@ impl Polygon {
         Self { vertices, edges }
     }
 
-    pub fn vertices(&self) -> Vec<vertex::Vertex> {
+    pub fn vertices(&self) -> Vec<Vertex> {
         self.vertices.clone()
     }
 
@@ -56,16 +56,16 @@ impl Polygon {
 #[derive(Debug, Clone, Copy)]
 pub struct Edge {
     // TODO - improve implementation to avoid storing duplicate vertices
-    v1: vertex::Vertex,
-    v2: vertex::Vertex,
+    v1: Vertex,
+    v2: Vertex,
 }
 
 impl Edge {
-    pub fn new(v1: vertex::Vertex, v2: vertex::Vertex) -> Edge {
+    pub fn new(v1: Vertex, v2: Vertex) -> Edge {
         Edge { v1, v2 }
     }
 
-    pub fn vertices(&self) -> (vertex::Vertex, vertex::Vertex) {
+    pub fn vertices(&self) -> (Vertex, Vertex) {
         (self.v1, self.v2)
     }
 

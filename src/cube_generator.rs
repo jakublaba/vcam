@@ -1,6 +1,6 @@
 use std::vec;
-
-use crate::{polygon::Polygon, vertex::Vertex};
+use crate::scene::polygon::Polygon;
+use crate::scene::vertex::Vertex;
 
 pub fn generate_cubes() -> Vec<Polygon> {
     let polygons = vec![Polygon::from_vertices(vec![
