@@ -70,7 +70,6 @@ impl Edge {
     }
 
     pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
-        let clip_range = (pos.z + near)..=(pos.z + far);
-        clip_range.contains(&self.v1.z()) && clip_range.contains(&self.v2.z())
+        self.v1.is_visible(pos, near, far) && self.v2.is_visible(pos, near, far)
     }
 }

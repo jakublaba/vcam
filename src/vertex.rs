@@ -34,7 +34,9 @@ impl Vertex {
 
     pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
         let clip_range = (pos.z + near)..=(pos.z + far);
-        clip_range.contains(&self.position.z)
+        let is_vis = clip_range.contains(&self.position.z);
+        log::debug!("visible: {is_vis}");
+        is_vis
     }
 
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Vertex {
@@ -46,9 +48,9 @@ impl Vertex {
         let y = (self.y() + 1.) * 0.5 * vh as f64;
         let z = 0.;
 
-        println!("project_to_view");
-        println!("self x: {}, y: {}, z: {}", self.x(), self.y(), self.z());
-        println!("x: {}, y: {}, z: {}", x, y, z);
+        log::debug!("project_to_view");
+        log::debug!("self x: {}, y: {}, z: {}", self.x(), self.y(), self.z());
+        log::debug!("x: {}, y: {}, z: {}", x, y, z);
 
         Vertex::new(x, y, z)
     }

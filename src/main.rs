@@ -1,6 +1,7 @@
 use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
+use log::Level;
 use polygon::Polygon;
 use scene::Scene;
 use sdl2::event::Event;
@@ -20,10 +21,15 @@ const LOOK_STEP: f64 = 2.5;
 const ZOOM_STEP: f64 = 5.;
 const TILT_STEP: f64 = 5.;
 const AR: f64 = (VW / VH) as f64;
-const NEAR: f64 = 1.;
-const FAR: f64 = 100.;
+const NEAR: f64 = 30.;
+const FAR: f64 = 300.;
+const FOV_MIN: f64 = 30.;
+const FOV_MAX: f64 = 90.;
+const FOV_DEFAULT: f64 = (FOV_MIN + FOV_MAX) / 2.;
 
 fn main() -> Result<(), String> {
+    simple_logger::init_with_level(Level::Debug)
+        .map_err(|e| e.to_string())?;
     let objects: Vec<Polygon> = cube_generator::generate_cubes();
 
     let scene = Scene::new(objects);
@@ -48,7 +54,7 @@ fn main() -> Result<(), String> {
 
     let mut position = Point3::new(0., 0., 0.);
     let mut forward = Vector3::new(0., 0., 1.);
-    let mut fov = 45.;
+    let mut fov = FOV_DEFAULT;
     let mut up = Vector3::new(0., 1., 0.);
 
     let mut event_pump = sdl_context.event_pump()?;
@@ -110,7 +116,7 @@ fn main() -> Result<(), String> {
                     ..
                 } => {
                     // zoom in
-                    if fov > 30. {
+                    if fov > FOV_MIN {
                         fov -= ZOOM_STEP;
                     }
                 }
@@ -119,9 +125,16 @@ fn main() -> Result<(), String> {
                     ..
                 } => {
                     // zoom out
-                    if fov < 90. {
+                    if fov < FOV_MAX {
                         fov += ZOOM_STEP;
                     }
+                }
+                Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    ..
+                } => {
+                    // reset zoom
+                    fov = FOV_DEFAULT
                 }
                 Event::KeyDown {
                     keycode: Some(Keycode::I),
@@ -187,14 +200,14 @@ fn main() -> Result<(), String> {
             poly.edges().iter().for_each(|edge| {
                 let (a_vertex, b_vertex) = edge.vertices();
 
-                println!("a_vertex: x{} y{}", a_vertex.x(), a_vertex.y());
-                println!("b_vertex: x{} y{}", b_vertex.x(), b_vertex.y());
+                log::debug!("a_vertex: x{} y{}", a_vertex.x(), a_vertex.y());
+                log::debug!("b_vertex: x{} y{}", b_vertex.x(), b_vertex.y());
 
                 let a = Point::new(a_vertex.x() as i32, a_vertex.y() as i32);
                 let b = Point::new(b_vertex.x() as i32, b_vertex.y() as i32);
 
-                println!("a: x{} y{}", a.x(), a.y());
-                println!("b: x{} y{}", b.x(), b.y());
+                log::debug!("a: x{} y{}", a.x(), a.y());
+                log::debug!("b: x{} y{}", b.x(), b.y());
 
                 canvas.draw_line(a, b).unwrap();
             });
