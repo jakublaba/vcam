@@ -48,3 +48,31 @@ impl Scene {
         Scene::new(projected_polygons)
     }
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn should_return_empty_scene_when_nothing_visible() {
+
+    }
+
+    #[test]
+    fn should_retain_everything_when_everything_visible() {
+
+    }
+
+    #[test]
+    fn should_retain_only_visible_polygons_when_partly_visible() {
+
+    }
+
+    #[test]
+    fn should_transform_correctly() {
+
+    }
+
+    #[test]
+    fn should_map_to_screen_correctly() {
+
+    }
+}
