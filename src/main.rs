@@ -11,9 +11,6 @@ use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 
-use crate::scene::polygon::Polygon;
-use crate::scene::Scene;
-
 mod cube_generator;
 mod obj;
 mod scene;

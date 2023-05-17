@@ -28,6 +28,10 @@ impl Vertex {
         self.position.z.clone()
     }
 
+    pub fn position(&self) -> Point3<f64> {
+        self.position.clone()
+    }
+
     pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
         let clip_range = (pos.z + near)..=(pos.z + far);
         let is_vis = clip_range.contains(&self.position.z);
