@@ -1,9 +1,9 @@
-pub(crate) mod polygon;
-pub(crate) mod vertex;
-
 use cgmath::{Matrix4, Point3};
 
 use crate::scene::polygon::Polygon;
+
+pub(crate) mod polygon;
+pub(crate) mod vertex;
 
 #[derive(Debug)]
 pub struct Scene {
@@ -46,5 +46,16 @@ impl Scene {
             .collect();
 
         Scene::new(projected_polygons)
+    }
+
+    pub fn sorted(&self, camera_position: Point3<f64>) -> Scene {
+        let mut polygons_sorted = self.polygons.clone();
+        polygons_sorted
+            .sort_by(|a, b| {
+                a.distance_to_camera(camera_position)
+                    .total_cmp(&b.distance_to_camera(camera_position))
+            });
+
+        Scene::new(polygons_sorted)
     }
 }

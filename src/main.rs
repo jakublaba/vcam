@@ -1,15 +1,17 @@
 use std::time::Duration;
 
-use crate::scene::Scene;
 use cgmath::{
-    perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
+    Deg, InnerSpace, Matrix4, perspective, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
 use log::Level;
-use obj::read_polygons_from_obj;
 use sdl2::event::Event;
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+
+use obj::read_polygons_from_obj;
+
+use crate::scene::Scene;
 
 mod cube_generator;
 mod obj;
@@ -201,6 +203,7 @@ fn main() -> Result<(), String> {
 
         let projected_scene = scene
             .clip(position, NEAR, FAR)
+            .sorted(position)
             .transform(view)
             .transform(projection)
             .screen_coords(VW, VH);
