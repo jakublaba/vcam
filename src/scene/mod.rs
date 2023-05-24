@@ -19,16 +19,6 @@ impl Scene {
         self.polygons.clone()
     }
 
-    pub fn clip(&self, pos: Point3<f64>, near: f64, far: f64) -> Scene {
-        let polygons_clipped = self
-            .polygons
-            .iter()
-            .filter(|p| p.is_visible(pos, near, far))
-            .map(|p| p.clone())
-            .collect();
-        Scene::new(polygons_clipped)
-    }
-
     pub fn transform(&self, transform_matrix: Matrix4<f64>) -> Scene {
         let polygons_transformed = self
             .polygons
@@ -54,6 +44,7 @@ impl Scene {
         Scene::new(projected_polygons_visible)
     }
 
+    // TODO: Sorting
     pub fn sorted(&self, camera_position: Point3<f64>) -> Scene {
         let mut polygons_sorted = self.polygons.clone();
         polygons_sorted.sort_by(|a, b| {

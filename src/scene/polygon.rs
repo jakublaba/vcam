@@ -15,27 +15,6 @@ enum Coord {
     Z,
 }
 
-// impl Eq for Polygon {}
-//
-// impl PartialEq<Self> for Polygon {
-//     fn eq(&self, other: &Self) -> bool {
-//         (&self.edges, &self.vertices) == (&other.edges, &other.vertices)
-//     }
-// }
-//
-// impl PartialOrd<Self> for Polygon {
-//     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-//         Some(self.cmp(other))
-//     }
-// }
-//
-// impl Ord for Polygon {
-//     fn cmp(&self, other: &Self) -> Ordering {
-//         self.centroid()
-//         todo!()
-//     }
-// }
-
 impl Polygon {
     pub fn from_vertices(vertices: Vec<Vertex>) -> Self {
         let mut edges = Vec::new();
@@ -47,15 +26,6 @@ impl Polygon {
 
     pub fn vertices(&self) -> Vec<Vertex> {
         self.vertices.clone()
-    }
-
-    pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
-        for e in &self.edges {
-            if !e.is_visible(pos, near, far) {
-                return false;
-            }
-        }
-        true
     }
 
     pub fn transform(&self, transform_matrix: cgmath::Matrix4<f64>) -> Polygon {
@@ -135,9 +105,5 @@ pub struct Edge {
 impl Edge {
     pub fn new(v1: Vertex, v2: Vertex) -> Edge {
         Edge { v1, v2 }
-    }
-
-    pub fn is_visible(&self, pos: Point3<f64>, near: f64, far: f64) -> bool {
-        self.v1.is_visible(pos, near, far) && self.v2.is_visible(pos, near, far)
     }
 }

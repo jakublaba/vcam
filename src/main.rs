@@ -202,10 +202,8 @@ fn main() -> Result<(), String> {
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
         let projected_scene = scene
-            // .clip(position, NEAR, FAR)
             .transform(view)
             .transform(projection)
-            // .sorted(position)
             .screen_coords(VW, VH);
 
         canvas.set_draw_color(Color::BLACK);
