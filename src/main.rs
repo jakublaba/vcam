@@ -1,15 +1,18 @@
 use std::time::Duration;
 
-use crate::scene::Scene;
 use cgmath::{
     perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
 use log::Level;
-use obj::read_polygons_from_obj;
 use sdl2::event::Event;
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
+
+use obj::read_polygons_from_obj;
+use sdl2::rect::Point;
+
+use crate::scene::Scene;
 
 mod cube_generator;
 mod obj;
@@ -22,7 +25,7 @@ const LOOK_STEP: f64 = 2.5;
 const ZOOM_STEP: f64 = 5.;
 const TILT_STEP: f64 = 5.;
 const AR: f64 = (VW / VH) as f64;
-const NEAR: f64 = 1.;
+const NEAR: f64 = 5.;
 const FAR: f64 = 300.;
 const FOV_MIN: f64 = 30.;
 const FOV_MAX: f64 = 90.;
@@ -200,7 +203,6 @@ fn main() -> Result<(), String> {
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
         let projected_scene = scene
-            .clip(position, NEAR, FAR)
             .transform(view)
             .transform(projection)
             .screen_coords(VW, VH);
@@ -214,6 +216,14 @@ fn main() -> Result<(), String> {
             let vx: &[i16] = &vx_vec;
             let vy: &[i16] = &vy_vec;
             canvas.filled_polygon(vx, vy, Color::BLUE).unwrap();
+
+            canvas.set_draw_color(Color::BLACK);
+            poly.edges().iter().for_each(|e| {
+                let start: Point = Point::new(e.v1().x() as i32, e.v1().y() as i32);
+                let end: Point = Point::new(e.v2().x() as i32, e.v2().y() as i32);
+
+                canvas.draw_line(start, end).unwrap()
+            });
         }
 
         canvas.present();
