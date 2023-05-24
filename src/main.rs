@@ -211,13 +211,6 @@ fn main() -> Result<(), String> {
 
         canvas.set_draw_color(Color::BLACK);
         for poly in &projected_scene.polygons() {
-            //canvas.set_draw_color(Color::BLACK);
-            //poly.edges().iter().for_each(|e| {
-            //    let start: Point = Point::new(e.v1().x() as i32, e.v1().y() as i32);
-            //    let end: Point = Point::new(e.v2().x() as i32, e.v2().y() as i32);
-            //    canvas.draw_line(start, end).unwrap()
-            //});
-
             let vertices = poly.vertices();
             let vx_vec: Vec<i16> = vertices.iter().map(|v| v.position().x as i16).collect();
             let vy_vec: Vec<i16> = vertices.iter().map(|v| v.position().y as i16).collect();
