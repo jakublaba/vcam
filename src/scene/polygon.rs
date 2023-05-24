@@ -24,6 +24,10 @@ impl Polygon {
         Self { vertices, edges }
     }
 
+    pub fn edges(&self) -> Vec<Edge> {
+        self.edges.clone()
+    }
+
     pub fn vertices(&self) -> Vec<Vertex> {
         self.vertices.clone()
     }
@@ -105,5 +109,13 @@ pub struct Edge {
 impl Edge {
     pub fn new(v1: Vertex, v2: Vertex) -> Edge {
         Edge { v1, v2 }
+    }
+
+    pub fn v1(&self) -> Vertex {
+        self.v1
+    }
+
+    pub fn v2(&self) -> Vertex {
+        self.v2
     }
 }

@@ -10,6 +10,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 
 use obj::read_polygons_from_obj;
+use sdl2::rect::Point;
 
 use crate::scene::Scene;
 
@@ -215,6 +216,14 @@ fn main() -> Result<(), String> {
             let vx: &[i16] = &vx_vec;
             let vy: &[i16] = &vy_vec;
             canvas.filled_polygon(vx, vy, Color::BLUE).unwrap();
+
+            canvas.set_draw_color(Color::BLACK);
+            poly.edges().iter().for_each(|e| {
+                let start: Point = Point::new(e.v1().x() as i32, e.v1().y() as i32);
+                let end: Point = Point::new(e.v2().x() as i32, e.v2().y() as i32);
+
+                canvas.draw_line(start, end).unwrap()
+            });
         }
 
         canvas.present();
