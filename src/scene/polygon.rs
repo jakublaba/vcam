@@ -67,14 +67,21 @@ impl Polygon {
         Polygon::from_vertices(v)
     }
 
-    pub fn screen_coords(&self, vw: u32, vh: u32) -> Polygon {
-        let v = self
+    // todo better option usage
+    pub fn screen_coords(&self, vw: u32, vh: u32) -> Option<Polygon> {
+        let v: Vec<Option<Vertex>> = self
             .vertices
             .iter()
             .map(|v| v.screen_coords(vw, vh))
             .collect();
 
-        Polygon::from_vertices(v)
+        if v.iter().any(|v| v.is_none()) {
+            return None;
+        }
+
+        let v: Vec<Vertex> = v.into_iter().map(|v| v.unwrap()).collect();
+
+        Some(Polygon::from_vertices(v))
     }
 
     pub fn distance_to_camera(&self, camera_pos: Point3<f64>) -> f64 {

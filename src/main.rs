@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use cgmath::{
-    Deg, InnerSpace, Matrix4, perspective, Point3, Quaternion, Rotation, Rotation3, Vector3,
+    perspective, Deg, InnerSpace, Matrix4, Point3, Quaternion, Rotation, Rotation3, Vector3,
 };
 use log::Level;
 use sdl2::event::Event;
@@ -24,7 +24,7 @@ const LOOK_STEP: f64 = 2.5;
 const ZOOM_STEP: f64 = 5.;
 const TILT_STEP: f64 = 5.;
 const AR: f64 = (VW / VH) as f64;
-const NEAR: f64 = 1.;
+const NEAR: f64 = 5.;
 const FAR: f64 = 300.;
 const FOV_MIN: f64 = 30.;
 const FOV_MAX: f64 = 90.;
@@ -202,10 +202,10 @@ fn main() -> Result<(), String> {
         let projection = perspective(Deg(fov), AR, NEAR, FAR);
 
         let projected_scene = scene
-            .clip(position, NEAR, FAR)
-            .sorted(position)
+            // .clip(position, NEAR, FAR)
             .transform(view)
             .transform(projection)
+            // .sorted(position)
             .screen_coords(VW, VH);
 
         canvas.set_draw_color(Color::BLACK);

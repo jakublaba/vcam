@@ -39,22 +39,27 @@ impl Scene {
     }
 
     pub fn screen_coords(&self, vw: u32, vh: u32) -> Scene {
-        let projected_polygons = self
+        let projected_polygons: Vec<Option<Polygon>> = self
             .polygons
             .iter()
             .map(|p| p.screen_coords(vw, vh))
             .collect();
 
-        Scene::new(projected_polygons)
+        let projected_polygons_visible = projected_polygons
+            .iter()
+            .filter(|p| p.is_some())
+            .map(|p| p.clone().unwrap())
+            .collect();
+
+        Scene::new(projected_polygons_visible)
     }
 
     pub fn sorted(&self, camera_position: Point3<f64>) -> Scene {
         let mut polygons_sorted = self.polygons.clone();
-        polygons_sorted
-            .sort_by(|a, b| {
-                a.distance_to_camera(camera_position)
-                    .total_cmp(&b.distance_to_camera(camera_position))
-            });
+        polygons_sorted.sort_by(|a, b| {
+            a.distance_to_camera(camera_position)
+                .total_cmp(&b.distance_to_camera(camera_position))
+        });
 
         Scene::new(polygons_sorted)
     }
