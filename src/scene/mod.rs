@@ -48,8 +48,11 @@ impl Scene {
     pub fn sorted(&self, camera_position: Point3<f64>) -> Scene {
         let mut polygons_sorted = self.polygons.clone();
         polygons_sorted.sort_by(|a, b| {
-            a.distance_to_camera(camera_position)
-                .total_cmp(&b.distance_to_camera(camera_position))
+            let a_centr = a.centroid();
+            let b_centr = b.centroid();
+            let a_dist = a_centr.distance2(camera_position);
+            let b_dist = b_centr.distance2(camera_position);
+            b_dist.total_cmp(&a_dist)
         });
 
         Scene::new(polygons_sorted)

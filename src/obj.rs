@@ -1,3 +1,4 @@
+use sdl2::pixels::Color;
 use std::{fs::File, io::BufRead, io::BufReader};
 
 use crate::scene::{polygon::Polygon, vertex::Vertex};
@@ -48,11 +49,10 @@ pub fn read_polygons_from_obj(path: &str) -> Result<Vec<Polygon>, String> {
                     .ok_or("Missing third vertex")?
                     .parse::<usize>()
                     .map_err(|e| e.to_string())?;
-                polygons.push(Polygon::from_vertices(vec![
-                    vertices[v1 - 1],
-                    vertices[v2 - 1],
-                    vertices[v3 - 1],
-                ]));
+                polygons.push(Polygon::from_vertices(
+                    vec![vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1]],
+                    Color::GREEN,
+                ));
             }
             Some(_) => {}
             None => {}

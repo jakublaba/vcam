@@ -9,12 +9,11 @@ use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 
+use crate::scene::polygon::Polygon;
 use obj::read_polygons_from_obj;
-use sdl2::rect::Point;
 
 use crate::scene::Scene;
 
-mod cube_generator;
 mod obj;
 mod scene;
 
@@ -32,20 +31,23 @@ const FOV_MAX: f64 = 90.;
 const FOV_DEFAULT: f64 = (FOV_MIN + FOV_MAX) / 2.;
 const SCALE: f64 = 10.;
 
+fn get_color() -> Color {
+    let r = rand::random::<u8>();
+    let g = rand::random::<u8>();
+    let b = rand::random::<u8>();
+    Color::RGB(r, g, b)
+}
+
 fn main() -> Result<(), String> {
     simple_logger::init_with_level(Level::Debug).map_err(|e| e.to_string())?;
 
     let file = std::env::args().nth(1).ok_or("Missing obj file");
 
-    let objects = match file {
-        Ok(file) => read_polygons_from_obj(&file)?,
-        Err(_) => {
-            log::info!("No obj file provided, generating cubes...");
-            cube_generator::generate_cubes()
-        }
-    };
+    let objects = read_polygons_from_obj(&file?)?;
 
-    let scene = Scene::new(objects).transform(Matrix4::from_scale(SCALE));
+    let colored_objects: Vec<Polygon> = objects.iter().map(|p| p.with_color(get_color())).collect();
+
+    let scene = Scene::new(colored_objects).transform(Matrix4::from_scale(SCALE));
 
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -209,21 +211,12 @@ fn main() -> Result<(), String> {
 
         canvas.set_draw_color(Color::BLACK);
         for poly in &projected_scene.polygons() {
-            // TODO: Improve this flow
             let vertices = poly.vertices();
             let vx_vec: Vec<i16> = vertices.iter().map(|v| v.position().x as i16).collect();
             let vy_vec: Vec<i16> = vertices.iter().map(|v| v.position().y as i16).collect();
             let vx: &[i16] = &vx_vec;
             let vy: &[i16] = &vy_vec;
-            canvas.filled_polygon(vx, vy, Color::BLUE).unwrap();
-
-            canvas.set_draw_color(Color::BLACK);
-            poly.edges().iter().for_each(|e| {
-                let start: Point = Point::new(e.v1().x() as i32, e.v1().y() as i32);
-                let end: Point = Point::new(e.v2().x() as i32, e.v2().y() as i32);
-
-                canvas.draw_line(start, end).unwrap()
-            });
+            canvas.filled_polygon(vx, vy, poly.color).unwrap();
         }
 
         canvas.present();
