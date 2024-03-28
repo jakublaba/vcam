@@ -1,4 +1,4 @@
-use cgmath::{Matrix4, MetricSpace, Point3, Transform};
+use cgmath::{Matrix4, Point3, Transform};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vertex {

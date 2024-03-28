@@ -10,3 +10,4 @@ log = "0.4.17"
 simple_logger = "4.1.0"
 sdl2 = { version = "0.35.2", features = ["gfx"] }
 cgmath = "0.18.0"
+rand = "0.8.5"

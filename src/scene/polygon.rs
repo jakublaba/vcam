@@ -1,31 +1,24 @@
-use cgmath::{MetricSpace, Point3};
+use cgmath::{EuclideanSpace, Point3};
+use sdl2::pixels::Color;
 
-use crate::scene::polygon::Coord::{X, Y, Z};
 use crate::scene::vertex::Vertex;
 
 #[derive(Debug, Clone)]
 pub struct Polygon {
     vertices: Vec<Vertex>,
-    edges: Vec<Edge>,
-}
-
-enum Coord {
-    X,
-    Y,
-    Z,
+    pub color: Color,
 }
 
 impl Polygon {
-    pub fn from_vertices(vertices: Vec<Vertex>) -> Self {
-        let mut edges = Vec::new();
-        for i in 0..vertices.len() {
-            edges.push(Edge::new(vertices[i], vertices[(i + 1) % vertices.len()]));
+    pub fn with_color(&self, color: Color) -> Self {
+        Self {
+            vertices: self.vertices.clone(),
+            color,
         }
-        Self { vertices, edges }
     }
 
-    pub fn edges(&self) -> Vec<Edge> {
-        self.edges.clone()
+    pub fn from_vertices(vertices: Vec<Vertex>, color: Color) -> Self {
+        Self { vertices, color }
     }
 
     pub fn vertices(&self) -> Vec<Vertex> {
@@ -38,10 +31,9 @@ impl Polygon {
             .iter()
             .map(|v| v.transform(transform_matrix))
             .collect();
-        Polygon::from_vertices(v)
+        Polygon::from_vertices(v, self.color)
     }
 
-    // todo better option usage
     pub fn screen_coords(&self, vw: u32, vh: u32) -> Option<Polygon> {
         let v: Vec<Option<Vertex>> = self
             .vertices
@@ -55,67 +47,16 @@ impl Polygon {
 
         let v: Vec<Vertex> = v.into_iter().map(|v| v.unwrap()).collect();
 
-        Some(Polygon::from_vertices(v))
+        Some(Polygon::from_vertices(v, self.color))
     }
 
-    pub fn distance_to_camera(&self, camera_pos: Point3<f64>) -> f64 {
-        camera_pos.distance(self.centroid())
-    }
-
-    fn min_coord(&self, coord: Coord) -> f64 {
-        let mut min = f64::MAX;
-
-        for e in &self.edges {
-            min = min.min(match coord {
-                X => e.v1.x().min(e.v2.x()),
-                Y => e.v1.y().min(e.v2.y()),
-                Z => e.v1.z().min(e.v2.z()),
-            });
-        }
-
-        min
-    }
-
-    fn max_coord(&self, coord: Coord) -> f64 {
-        let mut max = f64::MIN;
-
-        for e in &self.edges {
-            max = max.max(match coord {
-                X => e.v1.x().max(e.v2.x()),
-                Y => e.v1.y().max(e.v2.y()),
-                Z => e.v1.z().max(e.v2.z()),
-            })
-        }
-
-        max
-    }
-
-    fn centroid(&self) -> Point3<f64> {
-        Point3::new(
-            (self.max_coord(X) + self.min_coord(X)) / 2.,
-            (self.max_coord(Y) + self.min_coord(Y)) / 2.,
-            (self.max_coord(Z) + self.min_coord(Z)) / 2.,
+    pub(crate) fn centroid(&self) -> Point3<f64> {
+        Point3::centroid(
+            &self
+                .vertices
+                .iter()
+                .map(|v| v.position())
+                .collect::<Vec<_>>(),
         )
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct Edge {
-    // TODO - improve implementation to avoid storing duplicate vertices
-    v1: Vertex,
-    v2: Vertex,
-}
-
-impl Edge {
-    pub fn new(v1: Vertex, v2: Vertex) -> Edge {
-        Edge { v1, v2 }
-    }
-
-    pub fn v1(&self) -> Vertex {
-        self.v1
-    }
-
-    pub fn v2(&self) -> Vertex {
-        self.v2
     }
 }
